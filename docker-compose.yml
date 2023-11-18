@@ -1,0 +1,51 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks: 
+      - my_net    
+
+  grafana:
+    image: grafana/grafana
+    restart: always
+    container_name: grafana
+    ports:
+      - "3000:3000"   
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=Abd@243001
+      - GF_SERVER_DOMAIN=192.168.1.10
+      - GF_SERVER_ROOT_URL=http://192.168.1.10/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true   
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+        #      - ./grafana:/etc/grafana 
+    networks: 
+      - my_net
+    user: "root:root"
+  nginx:
+    container_name: nginx
+    image: nginx
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/  
+    networks:
+      - my_net
+
+  node-exporter:
+    image: prom/node-exporter
+    restart: always
+    ports:
+      - 9100:9100  
+    networks:
+      - my_net
+        
+networks:
+  my_net:        
